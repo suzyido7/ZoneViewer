@@ -2,8 +2,8 @@
 
 ZoneViewer is a simple tool that gets from the Backend a list of Zones. The user can:
 1. See all the zones
-2. Create a new zone
-3. Delete an existing zone
+2. Create a new zone - click with the mouse on 4 locations in the area and a new zone will be created automaically.
+3. Delete an existing zone - browse the zones using the "next shape" and "prev shape" until you get to the desired zone to delete. Then click "delete shape"
 
 ## Available Scripts
 

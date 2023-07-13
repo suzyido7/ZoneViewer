@@ -18,6 +18,9 @@ function App() {
   const [newZone, setNewZone] = useState([]);
 
   const handleMouseClick = (event) => {
+    if(event.clientY > SVG_HEIGHT) {
+      return
+    }
     const updatedNewZone = newZone
     let isNewPoint = true
     for(let point of updatedNewZone) {
@@ -46,10 +49,8 @@ function App() {
     window.addEventListener('click', handleMouseClick);
 
     return () => {
-      window.removeEventListener(
-        'mousemove',
-        handleMouseMove
-      );
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('click', handleMouseClick);
     };
   }, [])
 
@@ -57,16 +58,27 @@ function App() {
     setToRefresh(false)
     setSelectedShape(-1)
     const updatedNewZone = newZone
-    updatedNewZone.splice(0)
     setNewZone(updatedNewZone.splice(0))
     fetchZonesData()
   }, [toRefresh])
 
+  
+  useEffect(() => {
+    setSelectedShape(-1)
+    const updatedNewZone = newZone
+    updatedNewZone.splice(0)
+    setNewZone(updatedNewZone.splice(0))
+  }, [zones])
+
   const drawZonesInArea = () => {
+    if(zones.length === 0) {
+      return(
+        <polygon points=""/>
+      )      
+    }
+    
     return zones.map((zone, index) => {
       const point = zone.points
-      const points = `${point[0][0]},${point[0][1]},${point[1][0]},${point[1][1]},
-                      ${point[2][0]},${point[2][1]},${point[3][0]},${point[3][1]},`
       const color = index === selectedShape ? SELECTED_ZONE_COLOR : ZONE_COLOR
       return(
         <polygon points={`${point.flat(1)}`} style={{fill: color}}/>
@@ -102,6 +114,10 @@ function App() {
   }
 
   const deleteZone = () => {
+    if(selectedShape < 0) {
+      setToRefresh(true)
+      return
+    }
     fetch(`${BASE_URL}zone/${zones[selectedShape].id}`, {
       method: 'DELETE',
     })
@@ -109,7 +125,7 @@ function App() {
     .then(setToRefresh(true))
     .catch(error => console.error(error));
   }
-
+  
   const createZone = (newZone) => {
     fetch(`${BASE_URL}zone`, {
       method: 'POST',
